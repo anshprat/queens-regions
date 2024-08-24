@@ -99,13 +99,16 @@ def save_to_file(filename, board, checksum, regions_formatted):
     """Save the board and its checksum to a file."""
     with open(filename, 'a') as file:
         if len(board)>0:
-            file.write("Board:\n")
+            file.write("Board:"+checksum+"\n")
             for row in board:
                 file.write(' '.join(map(str, row)) + '\n')
+                
         if len(regions_formatted)>1:
-            file.write("\nFormatted Regions:\n")
-            file.write(regions_formatted)
-        file.write(f"\nChecksum: {checksum}\n")
+            # file.write("\nFormatted Regions:\n")
+            # regions_formatted=regions_formatted+","
+            region = "("+str(checksum) +","+str(regions_formatted)+"),"
+            file.write(region)
+        # file.write(f"\nChecksum: {checksum}\n")
 
 
 def main():
@@ -118,7 +121,7 @@ def main():
     regions_checksum = calculate_checksum(region_colors)
 
     # Check if the checksums are already in the cache
-    if regions_checksum in checksum_cache:
+    if board_checksum in checksum_cache or regions_checksum in checksum_cache:
         print("Duplicate checksum detected. Skipping save.")
         return
 
@@ -130,8 +133,8 @@ def main():
     regions_formatted = format_array(region_colors)
 
     # Save to files
-    save_to_file('queens.txt', board, board_checksum, '')
-    save_to_file('regions.txt', np.zeros_like(region_colors), regions_checksum, regions_formatted)
+    save_to_file('queens.txt', board, str(board_checksum)+"|"+str(regions_checksum), '')
+    save_to_file('regions.txt', '', regions_checksum, regions_formatted)
 
     # Print to console as well
     print("Queens Board:")
@@ -147,6 +150,6 @@ def main():
 # Generate, print, and save the board with regions and checksums
 
 c=0
-while(c<10000):
+while(c<1000):
     c=c+1
     main()
